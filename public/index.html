@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./style.css" rel="css/text">
+    <title>Socket.IO</title>
+</head>
+<body>
+    <div id="login">
+            <h1>Welcome to caht App</h1>
+            <form>
+                <input type="text" id="name" placeholder="Enter Name" required>
+            
+                <input type="email" id="email" placeholder="Enter Email" required>
+                <button id="join">Join</button>
+            </form>
+    </div>
+    <div>
+        <input type="email" id="reciever_email" placeholder="Enter Email" required>
+        <input type="text" id="message" placeholder="Messages...." required>
+        <button id="send">Send</button>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket  = io('localhost:3000');
+        var btn = document.getElementById('join')
+        var sendBtn = document.getElementById('send')
+        btn.addEventListener('click',(eve)=>{
+            eve.preventDefault()
+            var name = document.getElementById('name').value
+            var email = document.getElementById('email').value
+           socket.emit('join',{name,email})
+           
+        })
+        //join the chat
+        socket.on('joined',(response)=>{
+            window.localStorage.setItem('email',response.email)
+            window.localStorage.setItem('name',response.name)
+            window.localStorage.setItem('id',response.socketId)
+           window.alert('connected')
+        })
+        //recieve messages
+        socket.on('recieve-message',(message)=>{
+            console.log(message)
+            window.alert("From :"+message.from + " Message :" + message.message)
+        })
+
+        //send message
+        sendBtn.addEventListener('click',()=>{
+            var to = document.getElementById('reciever_email').value
+            var message = document.getElementById('message').value
+            var form = window.localStorage.getItem('email')
+            socket.emit('send-message',{from:'kamini1@do.in',message,to})
+            console.log({from:'kamini1@do.in',message,to,timesatmp:new Date()})
+        })
+    </script>
+</body>
+</html>
